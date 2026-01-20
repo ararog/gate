@@ -1,7 +1,16 @@
 [package]
-name = "gate"
-version = "0.1.0"
-edition = "2024"
+name = "rt-gate"
+version = "0.1.1"
+edition = "2021"
+authors = ["Rogerio Araújo <rogerio.araujo@gmail.com>"]
+repository = "https://github.com/ararog/gate"
+homepage = "https://github.com/ararog/gate"
+description = "A tiny wrapper for async runtimes."
+readme = "README.md"
+license = "MIT"
+keywords = ["tasks", "async", "runtime", "wrapper"]
+publish = true
+rust-version = "1.64.0"
 
 [features]
 default = ["tokio-rt"]

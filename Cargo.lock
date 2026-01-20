@@ -236,14 +236,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "gate"
-version = "0.1.0"
-dependencies = [
- "smol",
- "tokio",
-]
-
-[[package]]
 name = "hermit-abi"
 version = "0.5.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -296,6 +288,14 @@ dependencies = [
  "pin-project-lite",
  "rustix",
  "windows-sys",
+]
+
+[[package]]
+name = "rt-gate"
+version = "0.1.1"
+dependencies = [
+ "smol",
+ "tokio",
 ]
 
 [[package]]
