@@ -22,10 +22,9 @@ where
     }
 }
 
-pub fn spawn_server<Fut>(future: Fut) -> GateTask<Fut>
+pub fn spawn_server<Fut>(future: Fut) -> GateTask
 where
-    Fut: Future + Send + 'static,
-    Fut::Output: Send + 'static,
+    Fut: Future<Output = ()> + Send + 'static,
 {
     #[cfg(feature = "tokio-rt")]
     {
@@ -40,27 +39,24 @@ where
     }
 }
 
-pub struct GateTask<F>
-  where F: Future {
-    #[cfg(feature = "tokio-rt")]
-    inner: Option<JoinHandle<F::Output>>,
-
-    #[cfg(feature = "smol-rt")]
-    inner: Option<smol::Task<F::Output>>,
-}
-
-impl<F> GateTask<F>
-where
-    F: Future + Send + 'static,
-    F::Output: Send + 'static,
+pub struct GateTask
 {
     #[cfg(feature = "tokio-rt")]
-    pub fn new(inner: Option<JoinHandle<F::Output>>) -> Self {
+    inner: Option<JoinHandle<()>>,
+
+    #[cfg(feature = "smol-rt")]
+    inner: Option<smol::Task<()>>,
+}
+
+impl GateTask
+{
+    #[cfg(feature = "tokio-rt")]
+    pub fn new(inner: Option<JoinHandle<()>>) -> Self {
         Self { inner }
     }
 
     #[cfg(feature = "smol-rt")]
-    pub fn new(inner: Option<smol::Task<F::Output>>) -> Self {
+    pub fn new(inner: Option<smol::Task<()>>) -> Self {
         Self { inner }
     }
 
