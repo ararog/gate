@@ -8,7 +8,8 @@ use smol::Task;
 
 pub fn spawn_worker<Fut>(future: Fut)
 where
-    Fut: Future<Output = ()> + Send + 'static,
+    Fut: Future + Send + 'static,
+    Fut::Output: Send + 'static,
 {
     #[cfg(feature = "tokio-rt")]
     {
@@ -21,9 +22,10 @@ where
     }
 }
 
-pub fn spawn_server<Fut>(future: Fut) -> GateTask
+pub fn spawn_server<Fut>(future: Fut) -> GateTask<Fut>
 where
-    Fut: Future<Output = ()> + Send + 'static,
+    Fut: Future + Send + 'static,
+    Fut::Output: Send + 'static,
 {
     #[cfg(feature = "tokio-rt")]
     {
@@ -38,22 +40,27 @@ where
     }
 }
 
-pub struct GateTask {
+pub struct GateTask<F>
+  where F: Future {
     #[cfg(feature = "tokio-rt")]
-    inner: Option<JoinHandle<()>>,
+    inner: Option<JoinHandle<F::Output>>,
 
     #[cfg(feature = "smol-rt")]
-    inner: Option<smol::Task<()>>,
+    inner: Option<smol::Task<F::Output>>,
 }
 
-impl GateTask {
+impl<F> GateTask<F>
+where
+    F: Future + Send + 'static,
+    F::Output: Send + 'static,
+{
     #[cfg(feature = "tokio-rt")]
-    pub fn new(inner: Option<JoinHandle<()>>) -> Self {
+    pub fn new(inner: Option<JoinHandle<F::Output>>) -> Self {
         Self { inner }
     }
 
     #[cfg(feature = "smol-rt")]
-    pub fn new(inner: Option<smol::Task<()>>) -> Self {
+    pub fn new(inner: Option<smol::Task<F::Output>>) -> Self {
         Self { inner }
     }
 
