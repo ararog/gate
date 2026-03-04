@@ -39,8 +39,7 @@ where
     }
 }
 
-pub struct GateTask
-{
+pub struct GateTask {
     #[cfg(feature = "tokio-rt")]
     inner: Option<JoinHandle<()>>,
 
@@ -48,8 +47,7 @@ pub struct GateTask
     inner: Option<smol::Task<()>>,
 }
 
-impl GateTask
-{
+impl GateTask {
     #[cfg(feature = "tokio-rt")]
     pub fn new(inner: Option<JoinHandle<()>>) -> Self {
         Self { inner }
