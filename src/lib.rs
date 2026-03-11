@@ -6,6 +6,9 @@ use tokio::task::JoinHandle;
 #[cfg(feature = "smol-rt")]
 use smol::Task;
 
+#[cfg(feature = "compio-rt")]
+use compio::runtime::JoinHandle;
+
 pub fn spawn_worker<Fut>(future: Fut)
 where
     Fut: Future + Send + 'static,
@@ -19,6 +22,11 @@ where
     #[cfg(feature = "smol-rt")]
     {
         smol::spawn(future).detach();
+    }
+
+    #[cfg(feature = "compio-rt")]
+    {
+        compio::runtime::spawn(future).detach();
     }
 }
 
@@ -37,6 +45,12 @@ where
         let handle = smol::spawn(future);
         GateTask::new(Some(handle))
     }
+
+    #[cfg(feature = "compio-rt")]
+    {
+        let handle = compio::runtime::spawn(future);
+        GateTask::new(Some(handle))
+    }
 }
 
 pub struct GateTask {
@@ -45,6 +59,9 @@ pub struct GateTask {
 
     #[cfg(feature = "smol-rt")]
     inner: Option<smol::Task<()>>,
+
+    #[cfg(feature = "compio-rt")]
+    inner: Option<JoinHandle<()>>,
 }
 
 impl GateTask {
@@ -58,6 +75,11 @@ impl GateTask {
         Self { inner }
     }
 
+    #[cfg(feature = "compio-rt")]
+    pub fn new(inner: Option<JoinHandle<()>>) -> Self {
+        Self { inner }
+    }
+
     pub async fn cancel(&mut self) {
         #[cfg(feature = "tokio-rt")]
         if let Some(handle) = self.inner.take() {
@@ -65,6 +87,11 @@ impl GateTask {
         }
 
         #[cfg(feature = "smol-rt")]
+        if let Some(handle) = self.inner.take() {
+            handle.cancel().await;
+        }
+
+        #[cfg(feature = "compio-rt")]
         if let Some(handle) = self.inner.take() {
             handle.cancel().await;
         }
