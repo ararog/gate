@@ -12,6 +12,9 @@ keywords = ["tasks", "async", "runtime", "wrapper"]
 publish = true
 rust-version = "1.64.0"
 
+[package.metadata.docs.rs]
+all-features = true
+
 [features]
 default = ["compio-rt"]
 
